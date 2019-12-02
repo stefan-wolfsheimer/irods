@@ -16,10 +16,16 @@ set(
   )
 
 set(
+  IRODS_AUTH_PLUGIN_pam2_SOURCES
+  ${CMAKE_SOURCE_DIR}/plugins/auth/pam2/libpam2.cpp
+  )
+
+set(
   IRODS_AUTH_PLUGINS
   native
   osauth
   pam
+  pam2
   )
 
 set(
