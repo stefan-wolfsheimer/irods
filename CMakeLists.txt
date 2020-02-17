@@ -886,6 +886,7 @@ set(
   ${CMAKE_SOURCE_DIR}/lib/core/src/irods_network_object.cpp
   ${CMAKE_SOURCE_DIR}/lib/core/src/irods_osauth_auth_object.cpp
   ${CMAKE_SOURCE_DIR}/lib/core/src/irods_pam_auth_object.cpp
+  ${CMAKE_SOURCE_DIR}/lib/core/src/irods_pam_interactive_auth_object.cpp
   ${CMAKE_SOURCE_DIR}/lib/core/src/irods_ssl_object.cpp
   ${CMAKE_SOURCE_DIR}/lib/core/src/irods_tcp_object.cpp
   )
@@ -1104,6 +1105,7 @@ set(
   ${CMAKE_SOURCE_DIR}/lib/core/src/irods_osauth_auth_object.cpp
   ${CMAKE_SOURCE_DIR}/lib/core/src/irods_pack_table.cpp
   ${CMAKE_SOURCE_DIR}/lib/core/src/irods_pam_auth_object.cpp
+  ${CMAKE_SOURCE_DIR}/lib/core/src/irods_pam_interactive_auth_object.cpp
   ${CMAKE_SOURCE_DIR}/lib/core/src/irods_parse_command_line_options.cpp
   ${CMAKE_SOURCE_DIR}/lib/core/src/irods_path_recursion.cpp
   ${CMAKE_SOURCE_DIR}/lib/core/src/irods_pluggable_auth_scheme.cpp

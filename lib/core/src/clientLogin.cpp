@@ -20,6 +20,7 @@
 #include "irods_auth_constants.hpp"
 #include "irods_native_auth_object.hpp"
 #include "irods_pam_auth_object.hpp"
+#include "irods_pam_interactive_auth_object.hpp"
 #include "authPluginRequest.h"
 #include "irods_configuration_parser.hpp"
 #include "irods_configuration_keywords.hpp"
@@ -272,6 +273,9 @@ int clientLogin(
             // case and only sent in as an override.
             // everyone other scheme behaves as normal
             if ( irods::AUTH_PAM_SCHEME == auth_scheme ) {
+                auth_scheme = irods::AUTH_NATIVE_SCHEME;
+            }
+            if ( irods::AUTH_PAM_INTERACTIVE_SCHEME == auth_scheme ) {
                 auth_scheme = irods::AUTH_NATIVE_SCHEME;
             }
         } // if _scheme_override
