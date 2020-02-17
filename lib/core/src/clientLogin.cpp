@@ -94,79 +94,6 @@ int printError( rcComm_t *Conn, int status, char *routineName ) {
     return 0;
 }
 
-int clientLoginPam( rcComm_t* Conn,
-                    char*     password,
-                    int       ttl ) {
-    using namespace boost::filesystem;
-    int status = 0;
-    pamAuthRequestInp_t pamAuthReqInp;
-    pamAuthRequestOut_t *pamAuthReqOut = NULL;
-    int len = 0;
-    char myPassword[MAX_PASSWORD_LEN + 2];
-    char userName[NAME_LEN * 2];
-    strncpy( userName, Conn->proxyUser.userName, NAME_LEN );
-    if ( password[0] != '\0' ) {
-        strncpy( myPassword, password, sizeof( myPassword ) );
-    }
-    else {
-        irods::termiosUtil tiosutl(STDIN_FILENO);
-        if ( !tiosutl.echoOff() )
-        {
-            printf( "WARNING: Error %d disabling echo mode. Password will be displayed in plaintext.\n", tiosutl.getError() );
-        }
-
-        printf( "Enter your current PAM (system) password:" );
-
-        const char *fgets_return = fgets( myPassword, sizeof( myPassword ), stdin );
-        if (fgets_return != myPassword || strlen(myPassword) < 2) {
-            // We're here because we either got an error or end-of-file.
-            myPassword[0] = '\0';
-        }
-
-        printf( "\n" );
-        if( tiosutl.getValid() && !tiosutl.echoOn() )
-        {
-            printf( "Error reinstating echo mode.\n" );
-        }
-    }
-    len = strlen( myPassword );
-    if ( len > 0 && myPassword[len - 1] == '\n' ) {
-        myPassword[len - 1] = '\0'; /* remove trailing \n */
-    }
-
-    /* since PAM requires a plain text password to be sent
-       to the server, ask the server to encrypt the current
-       communication socket. */
-    status = sslStart( Conn );
-    if ( status ) {
-        printError( Conn, status, "sslStart" );
-        return status;
-    }
-
-    memset( &pamAuthReqInp, 0, sizeof( pamAuthReqInp ) );
-    pamAuthReqInp.pamPassword = myPassword;
-    pamAuthReqInp.pamUser = userName;
-    pamAuthReqInp.timeToLive = ttl;
-    status = rcPamAuthRequest( Conn, &pamAuthReqInp, &pamAuthReqOut );
-    if ( status ) {
-        printError( Conn, status, "rcPamAuthRequest" );
-        sslEnd( Conn );
-        return status;
-    }
-    memset( myPassword, 0, sizeof( myPassword ) );
-    rodsLog( LOG_NOTICE, "iRODS password set up for iCommand use: %s\n",
-             pamAuthReqOut->irodsPamPassword );
-
-    /* can turn off SSL now. Have to request the server to do so.
-       Will also ignore any error returns, as future socket ops
-       are probably unaffected. */
-    sslEnd( Conn );
-
-    status = obfSavePw( 0, 0, 0,  pamAuthReqOut->irodsPamPassword );
-    return status;
-
-}
-
 /*
  Make a short-lived password.
  TTL is Time-to-live, in hours, typically in the few days range.
@@ -264,7 +191,6 @@ int clientLogin(
 
             // =-=-=-=-=-=-=-
             // ensure scheme is lower case for comparison
-            std::string lower_scheme = auth_scheme;
             std::transform( auth_scheme.begin(), auth_scheme.end(), auth_scheme.begin(), ::tolower );
 
             // =-=-=-=-=-=-=-
